@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width">
+        <meta name="mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <link rel="stylesheet" href="css/leaflet.css">
+        <link rel="stylesheet" href="css/qgis2web.css"><link rel="stylesheet" href="css/fontawesome-all.min.css">
+        <style>
+        html, body, #map {
+            width: 100%;
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+        </style>
+        <title></title>
+    </head>
+    <body>
+        <div id="map">
+        </div>
+        <script src="js/qgis2web_expressions.js"></script>
+        <script src="js/leaflet.js"></script>
+        <script src="js/leaflet.rotatedMarker.js"></script>
+        <script src="js/leaflet.pattern.js"></script>
+        <script src="js/leaflet-hash.js"></script>
+        <script src="js/Autolinker.min.js"></script>
+        <script src="js/rbush.min.js"></script>
+        <script src="js/labelgun.min.js"></script>
+        <script src="js/labels.js"></script>
+        <script src="data/GreaterBendigo10kmBuffer_1.js"></script>
+        <script src="data/GreaterBendigo_2.js"></script>
+        <script src="data/DestinationPoints_3.js"></script>
+        <script src="data/Destinations_4.js"></script>
+        <script src="data/BicycleNetwork_5.js"></script>
+        <script>
+        var map = L.map('map', {
+            zoomControl:true, maxZoom:28, minZoom:1
+        })
+        var hash = new L.Hash(map);
+        map.attributionControl.setPrefix('<a href="https://github.com/tomchadwin/qgis2web" target="_blank">qgis2web</a> &middot; <a href="https://leafletjs.com" title="A JS library for interactive maps">Leaflet</a> &middot; <a href="https://qgis.org">QGIS</a>');
+        var autolinker = new Autolinker({truncate: {length: 30, location: 'smart'}});
+        function removeEmptyRowsFromPopupContent(content, feature) {
+         var tempDiv = document.createElement('div');
+         tempDiv.innerHTML = content;
+         var rows = tempDiv.querySelectorAll('tr');
+         for (var i = 0; i < rows.length; i++) {
+             var td = rows[i].querySelector('td.visible-with-data');
+             var key = td ? td.id : '';
+             if (td && td.classList.contains('visible-with-data') && feature.properties[key] == null) {
+                 rows[i].parentNode.removeChild(rows[i]);
+             }
+         }
+         return tempDiv.innerHTML;
+        }
+        var bounds_group = new L.featureGroup([]);
+        function setBounds() {
+            if (bounds_group.getLayers().length) {
+                map.fitBounds(bounds_group.getBounds());
+            }
+        }
+        map.createPane('pane_OSMStandard_0');
+        map.getPane('pane_OSMStandard_0').style.zIndex = 400;
+        var layer_OSMStandard_0 = L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            pane: 'pane_OSMStandard_0',
+            opacity: 0.5,
+            attribution: '<a href="https://www.openstreetmap.org/copyright">© OpenStreetMap contributors, CC-BY-SA</a>',
+            minZoom: 1,
+            maxZoom: 28,
+            minNativeZoom: 0,
+            maxNativeZoom: 19
+        });
+        layer_OSMStandard_0;
+        map.addLayer(layer_OSMStandard_0);
+        function pop_GreaterBendigo10kmBuffer_1(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ogc_fid'] !== null ? autolinker.link(feature.properties['ogc_fid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ufi'] !== null ? autolinker.link(feature.properties['ufi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['pfi'] !== null ? autolinker.link(feature.properties['pfi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['ftype_code'] !== null ? autolinker.link(feature.properties['ftype_code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['lga_code'] !== null ? autolinker.link(feature.properties['lga_code'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['name'] !== null ? autolinker.link(feature.properties['name'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['officialnm'] !== null ? autolinker.link(feature.properties['officialnm'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['state'] !== null ? autolinker.link(feature.properties['state'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['abslgacode'] !== null ? autolinker.link(feature.properties['abslgacode'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['nfeat_id'] !== null ? autolinker.link(feature.properties['nfeat_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['fqid'] !== null ? autolinker.link(feature.properties['fqid'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['task_id'] !== null ? autolinker.link(feature.properties['task_id'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['crdate_pfi'] !== null ? autolinker.link(feature.properties['crdate_pfi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['super_pfi'] !== null ? autolinker.link(feature.properties['super_pfi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                    <tr>\
+                        <td colspan="2">' + (feature.properties['crdate_ufi'] !== null ? autolinker.link(feature.properties['crdate_ufi'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_GreaterBendigo10kmBuffer_1_0() {
+            return {
+                pane: 'pane_GreaterBendigo10kmBuffer_1',
+                opacity: 1,
+                color: 'rgba(204,204,204,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_GreaterBendigo10kmBuffer_1');
+        map.getPane('pane_GreaterBendigo10kmBuffer_1').style.zIndex = 401;
+        map.getPane('pane_GreaterBendigo10kmBuffer_1').style['mix-blend-mode'] = 'normal';
+        var layer_GreaterBendigo10kmBuffer_1 = new L.geoJson(json_GreaterBendigo10kmBuffer_1, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GreaterBendigo10kmBuffer_1',
+            layerName: 'layer_GreaterBendigo10kmBuffer_1',
+            pane: 'pane_GreaterBendigo10kmBuffer_1',
+            onEachFeature: pop_GreaterBendigo10kmBuffer_1,
+            style: style_GreaterBendigo10kmBuffer_1_0,
+        });
+        bounds_group.addLayer(layer_GreaterBendigo10kmBuffer_1);
+        map.addLayer(layer_GreaterBendigo10kmBuffer_1);
+        function pop_GreaterBendigo_2(feature, layer) {
+            var popupContent = '<table>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_GreaterBendigo_2_0() {
+            return {
+                pane: 'pane_GreaterBendigo_2',
+                opacity: 1,
+                color: 'rgba(51,51,51,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: false,
+            }
+        }
+        map.createPane('pane_GreaterBendigo_2');
+        map.getPane('pane_GreaterBendigo_2').style.zIndex = 402;
+        map.getPane('pane_GreaterBendigo_2').style['mix-blend-mode'] = 'normal';
+        var layer_GreaterBendigo_2 = new L.geoJson(json_GreaterBendigo_2, {
+            attribution: '',
+            interactive: false,
+            dataVar: 'json_GreaterBendigo_2',
+            layerName: 'layer_GreaterBendigo_2',
+            pane: 'pane_GreaterBendigo_2',
+            onEachFeature: pop_GreaterBendigo_2,
+            style: style_GreaterBendigo_2_0,
+        });
+        bounds_group.addLayer(layer_GreaterBendigo_2);
+        map.addLayer(layer_GreaterBendigo_2);
+        function pop_DestinationPoints_3(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">dest_type</th>\
+                        <td>' + (feature.properties['dest_type'] !== null ? autolinker.link(feature.properties['dest_type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_DestinationPoints_3_0() {
+            return {
+                pane: 'pane_DestinationPoints_3',
+                radius: 4.0,
+                opacity: 1,
+                color: 'rgba(128,17,25,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 2.0,
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(219,30,42,1.0)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_DestinationPoints_3');
+        map.getPane('pane_DestinationPoints_3').style.zIndex = 403;
+        map.getPane('pane_DestinationPoints_3').style['mix-blend-mode'] = 'normal';
+        var layer_DestinationPoints_3 = new L.geoJson(json_DestinationPoints_3, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_DestinationPoints_3',
+            layerName: 'layer_DestinationPoints_3',
+            pane: 'pane_DestinationPoints_3',
+            onEachFeature: pop_DestinationPoints_3,
+            pointToLayer: function (feature, latlng) {
+                var context = {
+                    feature: feature,
+                    variables: {}
+                };
+                return L.circleMarker(latlng, style_DestinationPoints_3_0(feature));
+            },
+        });
+        bounds_group.addLayer(layer_DestinationPoints_3);
+        map.addLayer(layer_DestinationPoints_3);
+        function pop_Destinations_4(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">dest_type</th>\
+                        <td>' + (feature.properties['dest_type'] !== null ? autolinker.link(feature.properties['dest_type'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_Destinations_4_0() {
+            return {
+                pane: 'pane_Destinations_4',
+                opacity: 1,
+                color: 'rgba(128,14,16,1.0)',
+                dashArray: '',
+                lineCap: 'butt',
+                lineJoin: 'miter',
+                weight: 1.0, 
+                fill: true,
+                fillOpacity: 1,
+                fillColor: 'rgba(228,26,28,0.6)',
+                interactive: true,
+            }
+        }
+        map.createPane('pane_Destinations_4');
+        map.getPane('pane_Destinations_4').style.zIndex = 404;
+        map.getPane('pane_Destinations_4').style['mix-blend-mode'] = 'normal';
+        var layer_Destinations_4 = new L.geoJson(json_Destinations_4, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_Destinations_4',
+            layerName: 'layer_Destinations_4',
+            pane: 'pane_Destinations_4',
+            onEachFeature: pop_Destinations_4,
+            style: style_Destinations_4_0,
+        });
+        bounds_group.addLayer(layer_Destinations_4);
+        map.addLayer(layer_Destinations_4);
+        function pop_BicycleNetwork_5(feature, layer) {
+            var popupContent = '<table>\
+                    <tr>\
+                        <th scope="row">cycleway</th>\
+                        <td>' + (feature.properties['cycleway'] !== null ? autolinker.link(feature.properties['cycleway'].toLocaleString()) : '') + '</td>\
+                    </tr>\
+                </table>';
+            layer.bindPopup(popupContent, {maxHeight: 400});
+            var popup = layer.getPopup();
+            var content = popup.getContent();
+            var updatedContent = removeEmptyRowsFromPopupContent(content, feature);
+            popup.setContent(updatedContent);
+        }
+
+        function style_BicycleNetwork_5_0(feature) {
+            switch(String(feature.properties['cycleway'])) {
+                case 'bikepath':
+                    return {
+                pane: 'pane_BicycleNetwork_5',
+                opacity: 1,
+                color: 'rgba(0,0,0,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'shared_path':
+                    return {
+                pane: 'pane_BicycleNetwork_5',
+                opacity: 1,
+                color: 'rgba(149,74,162,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'simple_lane':
+                    return {
+                pane: 'pane_BicycleNetwork_5',
+                opacity: 1,
+                color: 'rgba(247,128,30,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'shared_street':
+                    return {
+                pane: 'pane_BicycleNetwork_5',
+                opacity: 1,
+                color: 'rgba(84,176,74,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+                case 'separated_lane':
+                    return {
+                pane: 'pane_BicycleNetwork_5',
+                opacity: 1,
+                color: 'rgba(72,123,182,1.0)',
+                dashArray: '',
+                lineCap: 'square',
+                lineJoin: 'bevel',
+                weight: 3.0,
+                fillOpacity: 0,
+                interactive: true,
+            }
+                    break;
+            }
+        }
+        map.createPane('pane_BicycleNetwork_5');
+        map.getPane('pane_BicycleNetwork_5').style.zIndex = 405;
+        map.getPane('pane_BicycleNetwork_5').style['mix-blend-mode'] = 'normal';
+        var layer_BicycleNetwork_5 = new L.geoJson(json_BicycleNetwork_5, {
+            attribution: '',
+            interactive: true,
+            dataVar: 'json_BicycleNetwork_5',
+            layerName: 'layer_BicycleNetwork_5',
+            pane: 'pane_BicycleNetwork_5',
+            onEachFeature: pop_BicycleNetwork_5,
+            style: style_BicycleNetwork_5_0,
+        });
+        bounds_group.addLayer(layer_BicycleNetwork_5);
+        map.addLayer(layer_BicycleNetwork_5);
+            var abstract = new L.Control({'position':'topright'});
+            abstract.onAdd = function (map) {
+                this._div = L.DomUtil.create('div',
+                'leaflet-control abstract');
+                this._div.id = 'abstract'
+
+                    abstract.show();
+                    return this._div;
+                };
+                abstract.show = function () {
+                    this._div.classList.remove("abstract");
+                    this._div.classList.add("abstractUncollapsed");
+                    this._div.innerHTML = 'Bendigo Bicycle Network and Destinations';
+            };
+            abstract.addTo(map);
+        var baseMaps = {};
+        L.control.layers(baseMaps,{'Bicycle Network<br /><table><tr><td style="text-align: center;"><img src="legend/BicycleNetwork_5_BikePath0.png" /></td><td>Bike Path</td></tr><tr><td style="text-align: center;"><img src="legend/BicycleNetwork_5_SharedPath1.png" /></td><td>Shared Path</td></tr><tr><td style="text-align: center;"><img src="legend/BicycleNetwork_5_SimpleLane2.png" /></td><td>Simple Lane</td></tr><tr><td style="text-align: center;"><img src="legend/BicycleNetwork_5_SharedStreet3.png" /></td><td>Shared Street</td></tr><tr><td style="text-align: center;"><img src="legend/BicycleNetwork_5_SeparatedLane4.png" /></td><td>Separated Lane</td></tr></table>': layer_BicycleNetwork_5,'<img src="legend/Destinations_4.png" /> Destinations': layer_Destinations_4,'<img src="legend/DestinationPoints_3.png" /> Destination Points': layer_DestinationPoints_3,'<img src="legend/GreaterBendigo_2.png" /> Greater Bendigo': layer_GreaterBendigo_2,'<img src="legend/GreaterBendigo10kmBuffer_1.png" /> Greater Bendigo 10km Buffer': layer_GreaterBendigo10kmBuffer_1,"OSM Standard": layer_OSMStandard_0,},{collapsed:false}).addTo(map);
+        setBounds();
+        </script>
+    </body>
+</html>
